@@ -1,0 +1,17 @@
+body {
+	
+    background-image: url(" {% static 'bg.jpg'%}");
+
+	
+	width : 100%;
+	background-repeat:repeat;
+	background-position:top;
+	background-attachment:fixed;
+}
+.navbar-brand {
+    font-family: 'Satisfy', cursive;
+}
+.navbar-collapse{
+    font-family: 'Satisfy', cursive;
+
+}

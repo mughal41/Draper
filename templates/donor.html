@@ -1,0 +1,16 @@
+{% extends 'layout.html'%}
+{% block content %}
+    <form action="confirm" method="POST">
+        {% csrf_token %}
+        <div class="form-row">
+            
+            
+            {%for f in form %}
+                <p>{{ f.label_tag }}</p>
+                <p>{{f}}</p>
+            {% endfor %}
+        </div>
+        <input type="Submit" value="Add Details">
+    </form>
+
+{%endblock%}
