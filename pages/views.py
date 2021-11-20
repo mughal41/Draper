@@ -1,28 +1,111 @@
-from django.shortcuts import render, redirect
-from django.views import generic
-from pages.models import Donorinfo, Postform
-from django.views.generic.edit import CreateView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from pages.models import *
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 # Create your views here.
 
 def home(request):
-    return render(request, 'index.html',{'title': 'Home Page'})
+    all_group = BloodGroup.objects.annotate(total=Count('donor'))
+    
+    return render(request, 'index.html',{'title': 'Home Page','all_group':all_group})
 
-def Donor(request):
-    form = Postform()
-    if request.method == 'POST':
-        form = Postform(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('Donor')
-    return render(request, 'donor.html', {'title': 'Donors Registration', 'form': form})
+def be_a_donor(request):
+    if request.method=="POST":   
+        username = request.POST['username']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        state = request.POST['state']
+        city = request.POST['city']
+        address = request.POST['address']
+        gender = request.POST['gender']
+        blood_group = request.POST['blood_group']
+        date = request.POST['date']
+        image = request.FILES['image']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+ 
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect('/signup')
+ 
+        user = User.objects.create_user(username=username, email=email, first_name=first_name, last_name=last_name, password=password)
+        donors = Donor.objects.create(donor=user, phone=phone, state=state, city=city, address=address, gender=gender, blood_group=BloodGroup.objects.get(name=blood_group), date_of_birth=date, image=image)
+        user.save()
+        donors.save()
+        return render(request, "index.html")
+    return render(request, 'donor.html', {'title': 'Donors Registration' })
 
-def donor_info(request):
-    form = Postform()
-    data = Donorinfo.objects.all()
-    return render(request, 'donors_info.html',{'title':'Confirmation','rows':data})
+def all_request(request):
+    requests = RequestBlood.objects.all()
+    return render(request, "all_request.html", {'requests':requests})
 
+def request(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        state = request.POST['state']
+        city = request.POST['city']
+        address = request.POST['address']
+        blood_group = request.POST['blood_group']
+        date = request.POST['date']
+        blood_requests = RequestBlood.objects.create(name=name, email=email, phone=phone, state=state, city=city, address=address, blood_group=BloodGroup.objects.get(name=blood_group), date=date)
+        blood_requests.save()
+        return render(request, "index.html")
+    return render(request, "request.html")
+def Login(request):
+    if request.user.is_authenticated:
+        return redirect("/")
+    else:
+        if request.method == "POST":
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+ 
+            if user is not None:
+                login(request, user)
+                return redirect("/profile")
+            else:
+                thank = True
+                return render(request, "user_login.html", {"thank":thank})
+    return render(request, "login.html")
+@login_required(login_url = '/login')
+def profile(request):
+    donor_profile = Donor.objects.get(donor=request.user)
+    return render(request, "profile.html", {'donor_profile':donor_profile})
 
-class DonorCreate(CreateView):
-    model = Donorinfo
-    fields = ['firstname', 'lastname','address','city','state','postalcode','country','bloodgroup','phonenumber','email']
-    template_name = 'donor_form.html'
+@login_required(login_url = '/login')
+def edit_profile(request):
+    donor_profile = Donor.objects.get(donor=request.user)
+    if request.method == "POST":
+        email = request.POST['email']
+        phone = request.POST['phone']
+        state = request.POST['state']
+        city = request.POST['city']
+        address = request.POST['address']
+ 
+        donor_profile.donor.email = email
+        donor_profile.phone = phone
+        donor_profile.state = state
+        donor_profile.city = city
+        donor_profile.address = address
+        donor_profile.save()
+        donor_profile.donor.save()
+ 
+        try:
+            image = request.FILES['image']
+            donor_profile.image = image
+            donor_profile.save()
+        except:
+            pass
+        alert = True
+        return render(request, "edit_profile.html", {'alert':alert})
+    return render(request, "edit_profile.html", {'donor_profile':donor_profile})    
+def donors_list(request, myid):
+    blood_groups = BloodGroup.objects.filter(id=myid).first()
+    donor = Donor.objects.filter(blood_group=blood_groups)
+    return render(request, "donors_list.html", {'donor':donor})    

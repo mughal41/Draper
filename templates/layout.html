@@ -15,24 +15,33 @@
     
 </head>
 <body>
+    
 <nav class="navbar navbar-inverse">
     <div class="container-fluid">
-
-        <!-- Header -->
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href=" {% url 'pages:index' %} ">Home</a>
+           
         </div>
-
-        <!-- Items -->
-        <div class="collapse navbar-collapse" id="topNavBar">
+        {% if request.user.is_authenticated %}
+        <div class="collapse navbar-collapse" id="topNavBar"></div>
+        <a class="navbar-brand" href=" {% url 'pages:index' %} ">Home</a>
+        <ul class="nav navbar-nav">
+            <li class=""><a href="{% url 'pages:profile' %} "><span class="glyphicon glyphicon-tint" aria-hidden="true"></span>&nbsp; Profile </a></li>
+            <li class=""><a href=" {% url 'pages:edit_profile' %} "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; Edit</a></li>
+            <li class=""><a href=" {% url 'pages:all_request' %} "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; See Requests</a></li>
+            <li class=""><a href=" "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;Logout</a></li>
+        </ul>
+            
+            {% else %}
+            <a class="navbar-brand" href=" {% url 'pages:index' %} ">Home</a>
             <ul class="nav navbar-nav">
-                <li class=""><a href=" {% url 'pages:Donor' %} "><span class="glyphicon glyphicon-tint" aria-hidden="true"></span>&nbsp; Become Donor</a></li>
-                <li class=""><a href=" {% url 'pages:Donor_info' %} "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; Detail</a></li>
+                <li class=""><a href="{% url 'pages:become_donor' %} "><span class="glyphicon glyphicon-tint" aria-hidden="true"></span>&nbsp; Become Donor</a></li>
+                <li class=""><a href=" {% url 'pages:request_blood' %} "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; Request donation</a></li>
+                <li class=""><a href=" {% url 'pages:all_request' %} "><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp; See Requests</a></li>
             </ul>
             <form class="navbar-form navbar-left" role="search" method="get" action=" 'index' ">
                 <div class="form-group">
@@ -42,23 +51,39 @@
             </form>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="{% url 'pages:DonorAdd' %}">
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Become
+                    <a href="{% url 'pages:become_donor' %}">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Become Donor
                     </a>
                 </li>
                 <li>
-                    <a href="">
-                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp; Logout
+                    <a href="{% url 'pages:login' %}">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp; Login
                     </a>
                 </li>
             </ul>
+            {% endif %}
+            
         </div>
 
     </div>
 </nav>
 
     {%block content%} 
-    
+    {% block body %}
+        {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+
+        {% block js %}
+        {% endblock %}
     {%endblock%}
 </body>
 </html>

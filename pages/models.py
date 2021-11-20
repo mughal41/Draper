@@ -37,27 +37,3 @@ class Donor(models.Model):
     def __str__(self):
         return str(self.blood_group)
 
-class Donorinfo(models.Model):
-    firstname = models.CharField(max_length=100)
-    lastname = models.CharField(max_length=100)
-    address = models.TextField(max_length=250)
-    city = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    postalcode = models.IntegerField()
-    country = models.CharField(max_length=50)
-    bloodgroup = models.CharField(max_length=10)
-    phonenumber = models.IntegerField()
-    email = models.EmailField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    objects = models.Manager
-
-    def get_absolute_url(self):
-        return reverse('Donor',kwargs={'pk': self.pk})
-
-class Postform(forms.ModelForm):
-    class Meta:
-        model = Donorinfo
-        fields = ['firstname', 'lastname','address','city','state','postalcode','country','bloodgroup','phonenumber','email']
-
